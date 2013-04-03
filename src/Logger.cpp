@@ -1,7 +1,15 @@
 #include "Logger.h"
 
+// stdlib headers
+#include <ctime>
+#include <iomanip>
 #include <iostream>
 #include <iterator>
+#include <sstream>
+
+// sys headers
+#include <pthread.h>
+#include <sys/time.h>
 
 Logger::Logger(const char* filename, Level minLogLevel)
   : _minLogLevel(minLogLevel)
@@ -13,7 +21,7 @@ Logger::Logger(const char* filename, Level minLogLevel)
 
 void Logger::log(int level, const char* begin, const char* end)
 {
-  if (level < _minLogLevel)
+  if (!_ofstream || level < _minLogLevel)
     return;
 
   bool isBadRange = (begin > end);
@@ -25,13 +33,46 @@ void Logger::log(int level, const char* begin, const char* end)
 
   if (_ofstream)
   {
-    _ofstream.write(begin, end - begin);
-    _ofstream << std::endl;
+    const std::string& line = formatLogLine(level, begin, end);
+
+    std::lock_guard<std::mutex> lock(_ofstreamMutex);
+    _ofstream << line;
   }
 }
 
 void Logger::flush()
 {
   if (_ofstream)
+  {
+    std::lock_guard<std::mutex> lock(_ofstreamMutex);
     _ofstream.flush();
+  }
+}
+
+std::string Logger::formatLogLine(int level, const char* begin, const char* end)
+{
+  std::ostringstream os;
+
+  // getting high resolution wall time
+  struct timeval s_timeval;
+  ::gettimeofday(&s_timeval, 0);
+
+  // timestamp
+  static const char format[] = "YYYYMMDD HH:MM:SS";
+  char buf[sizeof(format)];
+  std::strftime(buf, sizeof(buf), "%Y%m%d %H:%M:%S", std::localtime(&s_timeval.tv_sec));
+  os << buf;
+
+  // microseconds
+  os << "." << std::setw(6) << std::setfill('0') << s_timeval.tv_usec;
+
+  os << ":T" << ::pthread_self();
+
+  os << ":L" << level;
+
+  os << ": ";
+  os.write(begin, end - begin);
+  os << std::endl;
+
+  return os.str();
 }
