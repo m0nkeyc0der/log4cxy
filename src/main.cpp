@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <functional>
 #include <iostream>
 #include <sstream>
 #include <thread>
@@ -12,6 +13,16 @@ void writeToLog(Logger& log, int numMessages)
     log.log(i % (Logger::MAX_LEVEL + 1),
             "Hello from thread %1% iteration %2%", std::this_thread::get_id(), i);
   }
+}
+
+void runThreads(Logger& log, int numThreads, int numMessages)
+{
+  std::thread worker(writeToLog, std::ref(log), numMessages);
+
+  if (numThreads > 1)
+    runThreads(log, numThreads - 1, numMessages);
+
+  worker.join();
 }
 
 int main(int argc, char* argv[])
@@ -32,7 +43,15 @@ int main(int argc, char* argv[])
                         num_threads,
                         num_messages);
 
-  writeToLog(log, num_messages);
+  try
+  {
+    runThreads(log, num_threads, num_messages);
+  }
+  catch(const std::exception& err)
+  {
+    std::cerr << err.what() << std::endl;
+    log.log(Logger::ERROR, err.what());
+  }
 
   return 0;
 }

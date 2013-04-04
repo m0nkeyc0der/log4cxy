@@ -31,13 +31,9 @@ void Logger::log(int level, const char* begin, const char* end)
     return;
   }
 
-  if (_ofstream)
-  {
-    const std::string& line = formatLogLine(level, begin, end);
-
-    std::lock_guard<std::mutex> lock(_ofstreamMutex);
-    _ofstream << line;
-  }
+  const std::string& line = formatLogLine(level, begin, end);
+  std::lock_guard<std::mutex> lock(_ofstreamMutex);
+  _ofstream << line;
 }
 
 void Logger::flush()

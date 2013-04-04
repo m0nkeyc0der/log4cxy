@@ -34,9 +34,12 @@ public:
   template<typename... Args>
   void log(int level, const char* format, const Args&... args)
   {
-    boost::format f(format);
-    bind(f, args...);
-    log(level, boost::str(f));
+    if (level >= _minLogLevel && _ofstream)
+    {
+      boost::format f(format);
+      bind(f, args...);
+      log(level, boost::str(f));
+    }
   }
 
   //! Synchronously flush writing queue
