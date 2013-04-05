@@ -2,54 +2,77 @@
 #define LOGGER_H
 
 #include <cstring>
-#include <fstream>
-#include <string>
-#include <mutex>
-
+#include <exception>
 #include <boost/format.hpp>
+
+#include "LogLevel.h"
+#include "LogWriter.h"
+
+namespace log4cxy
+{
 
 class Logger
 {
 public:
-  enum Level
-  {
-    TRACE = 0, DEBUG = 1, INFO = 2, WARN = 3, ERROR = 4, MAX_LEVEL = 4
-  };
-
-  Logger(const char* filename, Level minLogLevel);
 
   //! Asynchronously write a message if level >= minLogLevel
-  void log(int level, const char* begin, const char* end);
-
-  void log(int level, const char* message)
+  void log(int level, const char* begin, const char* end) throw()
   {
-    log(level, message, message + std::strlen(message));
+    logImpl(level, begin, end);
   }
-  void log(int level, const std::string& message)
+
+  void log(int level, const char* message) throw()
   {
-    log(level, message.c_str(), message.c_str() + message.size());
+    logImpl(level, message, message + std::strlen(message));
+  }
+  void log(int level, const std::string& message) throw()
+  {
+    logImpl(level, message.c_str(), message.c_str() + message.size());
   }
 
   // boost::format syntax
   template<typename... Args>
-  void log(int level, const char* format, const Args&... args)
+  void log(int level, const char* format, const Args&... args) throw()
   {
-    if (level >= _minLogLevel && _ofstream)
+    bool isFatal = true;
+    try
     {
-      boost::format f(format);
-      bind(f, args...);
-      log(level, boost::str(f));
+      if (level >= _minLogLevel && _writerImpl->isValid())
+      {
+          isFatal = false;
+          boost::format f(format);
+          bind(f, args...);
+          const std::string& s = boost::str(f);
+
+          isFatal = true;
+          log(level, s);
+      }
+    }
+    catch(const std::exception& err)
+    {
+      if (isFatal)
+        std::cerr << "Logger fatal error: " << err.what() << std::endl;
+      else
+        log(ERROR, err.what());
     }
   }
 
+  /*******************************/
+
   //! Synchronously flush writing queue
-  void flush();
+  void flush() { _writerImpl->flush(); }
+
+  static Logger create(const char* filename, LogLevel minLogLevel);
 
 private:
-  Level _minLogLevel;
+  LogLevel _minLogLevel;
+  LogWriterThreadSafePtr _writerImpl;
 
-  std::ofstream _ofstream;
-  std::mutex _ofstreamMutex;
+  Logger(LogLevel minLogLevel, const LogWriterThreadSafePtr& writerImpl)
+    : _minLogLevel(minLogLevel), _writerImpl(writerImpl)
+  {}
+
+  void logImpl(int level, const char* begin, const char* end) throw();
 
   template<typename T, typename... Args>
   static void bind(boost::format& f, const T& arg1, const Args&... args)
@@ -61,5 +84,7 @@ private:
 
   static std::string formatLogLine(int level, const char* begin, const char* end);
 };
+
+} // ns log4cxy
 
 #endif /* LOGGER_H */

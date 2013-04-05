@@ -3,45 +3,47 @@
 // stdlib headers
 #include <ctime>
 #include <iomanip>
-#include <iostream>
-#include <iterator>
 #include <sstream>
 
 // sys headers
 #include <pthread.h>
 #include <sys/time.h>
 
-Logger::Logger(const char* filename, Level minLogLevel)
-  : _minLogLevel(minLogLevel)
-  , _ofstream(filename)
+// project headers
+#include "FileLogWriter.h"
+#include "SyncLogWriter.h"
+
+namespace log4cxy
 {
-  if (!_ofstream)
-    std::cerr << "cannot open log file " << filename << std::endl;
+
+Logger Logger::create(const char* filename, LogLevel minLogLevel)
+{
+  LogWriterPtr fileWriter(new FileLogWriter(filename));
+  LogWriterThreadSafePtr syncWriter(new SyncLogWriter(fileWriter));
+
+  return Logger(minLogLevel, syncWriter);
 }
 
-void Logger::log(int level, const char* begin, const char* end)
+void Logger::logImpl(int level, const char* begin, const char* end) throw()
 {
-  if (!_ofstream || level < _minLogLevel)
-    return;
-
-  bool isBadRange = (begin > end);
-  if (isBadRange)
+  try
   {
-    log(ERROR, "Logger - bad range in logger arguments");
-    return;
+    if (level < _minLogLevel || !_writerImpl->isValid())
+      return;
+
+    bool isBadRange = (begin > end);
+    if (isBadRange)
+    {
+      log(ERROR, "Logger - bad range in logger arguments");
+      return;
+    }
+
+    const std::string& line = formatLogLine(level, begin, end);
+    _writerImpl->writeLine(line);
   }
-
-  const std::string& line = formatLogLine(level, begin, end);
-  std::lock_guard<std::mutex> lock(_ofstreamMutex);
-  _ofstream << line;
-}
-
-void Logger::flush()
-{
-  if (_ofstream)
+  catch (const std::exception& err)
   {
-    std::lock_guard<std::mutex> lock(_ofstreamMutex);
-    _ofstream.flush();
+    std::cerr << "Logger fatal error: " << err.what() << std::endl;
   }
 }
 
@@ -71,4 +73,6 @@ std::string Logger::formatLogLine(int level, const char* begin, const char* end)
   os << std::endl;
 
   return os.str();
+}
+
 }
