@@ -16,6 +16,21 @@
 namespace log4cxy
 {
 
+void Logger::flush() throw()
+{
+  try
+  {
+    _writerImpl->flush();
+  }
+  catch (const std::exception& err)
+  {
+    log(ERROR, "Logger flush error: %1%", err.what());
+  }
+
+  if (_chainLogger)
+    _chainLogger->flush();
+}
+
 Logger Logger::create(const char* filename, LogLevel minLogLevel)
 {
   LogWriterPtr fileWriter(new FileLogWriter(filename));
@@ -24,26 +39,49 @@ Logger Logger::create(const char* filename, LogLevel minLogLevel)
   return Logger(minLogLevel, syncWriter);
 }
 
+Logger Logger::create(std::ostream& os, LogLevel minLogLevel)
+{
+  LogWriterPtr streamWriter(new StreamWriter(os));
+  LogWriterThreadSafePtr syncWriter(new SyncLogWriter(streamWriter));
+
+  return Logger(minLogLevel, syncWriter);
+}
+
+Logger& Logger::addChainLogger(Logger chainLogger)
+{
+  if (!_chainLogger)
+    _chainLogger.reset(new Logger(chainLogger));
+  else
+    _chainLogger->addChainLogger(chainLogger);
+
+  return (*this);
+}
+
 void Logger::logImpl(int level, const char* begin, const char* end) throw()
 {
-  try
+  if (level >= _minLogLevel && _writerImpl->isValid())
   {
-    if (level < _minLogLevel || !_writerImpl->isValid())
-      return;
-
-    bool isBadRange = (begin > end);
-    if (isBadRange)
+    try
     {
-      log(ERROR, "Logger - bad range in logger arguments");
-      return;
-    }
+      bool isBadRange = (begin > end);
+      if (isBadRange)
+      {
+        log(ERROR, "Logger - bad range in logger arguments");
+        return;
+      }
 
-    const std::string& line = formatLogLine(level, begin, end);
-    _writerImpl->writeLine(line);
+      const std::string& line = formatLogLine(level, begin, end);
+      _writerImpl->writeLine(line);
+    }
+    catch (const std::exception& err)
+    {
+      std::cerr << "Logger fatal error: " << err.what() << std::endl;
+    }
   }
-  catch (const std::exception& err)
+
+  if (_chainLogger)
   {
-    std::cerr << "Logger fatal error: " << err.what() << std::endl;
+    _chainLogger->logImpl(level, begin, end);
   }
 }
 

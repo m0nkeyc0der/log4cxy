@@ -37,6 +37,14 @@ public:
     raw(_writerImpl)->flush();
   }
 
+  virtual LogWriterPtr getImpl(FindImplPred pr)
+  {
+    if (pr(_writerImpl.get()))
+      return _writerImpl;
+
+    return LogWriterPtr();
+  }
+
 private:
   LogWriterPtr _writerImpl;
   std::mutex _writerImplMutex;

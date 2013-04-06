@@ -1,3 +1,4 @@
+#include <cassert>
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -5,6 +6,8 @@
 #include <thread>
 
 #include "Logger.h"
+#include "LogPerfMonitor.h"
+#include "StreamWriter.h"
 
 namespace log4cxy
 {
@@ -13,9 +16,11 @@ void writeToLog(Logger log, int numMessages)
 {
   for(int i = 1; i <= numMessages; ++i)
   {
-    log.log(i % (LogLevel::MAX + 1),
+    log.log(i % LogLevel::ALERT,
             "Hello from thread %1% iteration %2%", std::this_thread::get_id(), i);
   }
+
+  log.flush();
 }
 
 void runThreads(Logger log, int numThreadsToCreate, int numMessages)
@@ -29,8 +34,6 @@ void runThreads(Logger log, int numThreadsToCreate, int numMessages)
   }
   catch(const std::exception& err)
   {
-    std::cerr << "next runThreads raises an exception: " << err.what() << std::endl;
-
     log.log(ERROR, "runThreads tid=%1% numTreadsToCreate=%2% raises an exception: %3%",
                    std::this_thread::get_id(),
                    numThreadsToCreate,
@@ -47,8 +50,6 @@ int main(int argc, char* argv[])
   using std::atoi;
   using namespace log4cxy;
 
-  Logger log = Logger::create("1.log", LogLevel::INFO);
-
   int num_messages;
   if (argc < 2 || !(num_messages = atoi(argv[1])))
     num_messages = 1000; // = default
@@ -57,19 +58,45 @@ int main(int argc, char* argv[])
   if (argc < 3 || !(num_threads = atoi(argv[2])))
     num_threads = 4; // = default
 
-  log.log(LogLevel::INFO, "setting number of threads = %1%, number of messages per thread = %2%",
-                          num_threads,
-                          num_messages);
+  const char* logfile = "trace.log";
+  if (argc >= 4)
+    logfile = argv[3];
 
   try
   {
-    runThreads(log, num_threads, num_messages);
+    Logger log = Logger::create(logfile, LogLevel::TRACE);
+
+    // would like to have alert messages on stdout
+    log.addChainLogger(Logger::create(std::cout, LogLevel::ALERT));
+
+    // would like to have error messages on stderr & in error.log
+    log.addChainLogger(Logger::create(std::cerr, LogLevel::ERROR));
+    log.addChainLogger(Logger::create("error.log", LogLevel::ERROR));
+
+    try
+    {
+      StreamWriterThreadSafePtr filestreamWriter = log.getWriterImpl<StreamWriter>();
+      assert(filestreamWriter != 0);
+
+      Logger perfLog = Logger::create("perfmonitor.log", LogLevel::INFO).addChainLogger(log);
+      LogPerfMonitor perfMon(filestreamWriter, perfLog);
+      perfMon.runMonitorThread();
+
+      log.log(LogLevel::ALERT, "setting number of threads = %1%, number of messages per thread = %2%",
+                               num_threads,
+                               num_messages);
+
+      runThreads(log, num_threads, num_messages);
+    }
+    catch(const std::exception& err)
+    {
+      log.log(LogLevel::ERROR, err.what());
+      return 1;
+    }
   }
   catch(const std::exception& err)
   {
-    std::cerr << "runThreads error: " << err.what() << std::endl;
-    log.log(LogLevel::ERROR, "runThreads error: %1%", err.what());
-
+    std::cerr << err.what();
     return 1;
   }
 

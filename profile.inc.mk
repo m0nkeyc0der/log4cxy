@@ -17,15 +17,15 @@ GOOGLE_PPROF            = /usr/bin/google-pprof
 
 profile: $(PROFILE_FILENAME)
 
-$(PROFILE_FILENAME): $(LOG4CXY) $(PROFILE_REPORT_DIR)
+$(PROFILE_FILENAME): $(LOG4CXY)
+	@test -d $(PROFILE_REPORT_DIR) || mkdir -v  $(PROFILE_REPORT_DIR)
 	env LD_PRELOAD="/usr/lib/libprofiler.so" CPUPROFILE=$(PROFILE_FILENAME) CPUPROFILE_FREQUENCY=400 \
 	./$(LOG4CXY) $(PROFILE_NUM_MESSAGES) $(PROFILE_NUM_THREADS)
 	test -f $@
 
-$(PROFILE_REPORT_DIR):
-	mkdir -v $(PROFILE_REPORT_DIR)
+perf_report: $(PROFILE_REPORT_FILENAME).txt $(PROFILE_REPORT_FILENAME).pdf
 
-perf_report: $(PROFILE_FILENAME) $(PROFILE_REPORT_DIR)
+$(PROFILE_REPORT_FILENAME).txt $(PROFILE_REPORT_FILENAME).pdf: $(PROFILE_FILENAME)
 	@echo Generate text profile report...
 	$(GOOGLE_PPROF) --text $(LOG4CXY) $(PROFILE_FILENAME) | tee $(PROFILE_REPORT_FILENAME).txt | head
 	@echo Generate PDF  profile report...

@@ -3,6 +3,7 @@
 
 #include <cstring>
 #include <exception>
+#include <memory>
 #include <boost/format.hpp>
 
 #include "LogLevel.h"
@@ -14,8 +15,10 @@ namespace log4cxy
 class Logger
 {
 public:
-
-  //! Asynchronously write a message if level >= minLogLevel
+  /*!
+   * Asynchronously write a message to log if level >= minLogLevel.
+   * Forward the message to all chain loggers (if any).
+   */
   void log(int level, const char* begin, const char* end) throw()
   {
     logImpl(level, begin, end);
@@ -39,13 +42,17 @@ public:
     {
       if (level >= _minLogLevel && _writerImpl->isValid())
       {
-          isFatal = false;
-          boost::format f(format);
-          bind(f, args...);
-          const std::string& s = boost::str(f);
+        isFatal = false;
+        boost::format f(format);
+        bind(f, args...);
+        const std::string& s = boost::str(f);
 
-          isFatal = true;
-          log(level, s);
+        isFatal = true;
+        log(level, s);
+      }
+      else if(_chainLogger)
+      {
+        _chainLogger->log(level, format, args...);
       }
     }
     catch(const std::exception& err)
@@ -60,13 +67,39 @@ public:
   /*******************************/
 
   //! Synchronously flush writing queue
-  void flush() { _writerImpl->flush(); }
+  void flush() throw();
 
   static Logger create(const char* filename, LogLevel minLogLevel);
+  static Logger create(std::ostream& os, LogLevel minLogLevel);
+
+  Logger& addChainLogger(Logger chainLogger);
+
+  /*!
+   * Search for LogWriter implementation within this logger.
+   *
+   * Does not propagate the search to chained loggers.
+   *
+   * @return empty shared_ptr if specific implementation was not found
+   */
+  template<class T>
+  std::shared_ptr<T> getWriterImpl()
+  {
+    LogWriterPtr desiredWriterImpl;
+    LogWriterPtr ourWriter = std::const_pointer_cast<LogWriter>(_writerImpl);
+
+    LogWriter::FindImplPred pr = [](LogWriter* w){ return (dynamic_cast<T*>(w) != 0); };
+    if (pr(ourWriter.get()))
+      desiredWriterImpl = ourWriter;
+    else
+      desiredWriterImpl = ourWriter->getImpl(pr);
+
+    return std::dynamic_pointer_cast<T>(desiredWriterImpl);
+  }
 
 private:
   LogLevel _minLogLevel;
   LogWriterThreadSafePtr _writerImpl;
+  std::shared_ptr<Logger> _chainLogger;
 
   Logger(LogLevel minLogLevel, const LogWriterThreadSafePtr& writerImpl)
     : _minLogLevel(minLogLevel), _writerImpl(writerImpl)

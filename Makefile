@@ -8,10 +8,10 @@ LOG4CXY = log4cxy
 # Sources & objects
 # ===========================
 SRC_DIR = src
-SOURCES = $(notdir $(wildcard $(SRC_DIR)/*.cpp))
+SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
 
 OBJ_DIR = obj
-OBJECTS = $(patsubst %.cpp,%.o,$(SOURCES))
+OBJECTS = $(addprefix $(OBJ_DIR)/,$(patsubst %.cpp,%.o,$(notdir $(SOURCES))))
 
 
 # ===========================
@@ -38,20 +38,18 @@ LINK_FLAGS     = -pthread -lprofiler $(DEBUG_FLAGS)
 
 all: $(LOG4CXY)
 clean:
-	rm -rfv $(OBJ_DIR) $(LOG4CXY) report/ *.log
+	rm -rfv $(OBJ_DIR) $(LOG4CXY) *.log *.prof
 
 run: $(LOG4CXY)
 	./$(LOG4CXY)
 
-$(LOG4CXY): $(addprefix $(OBJ_DIR)/,$(OBJECTS)) Makefile
-	g++ $(LINK_FLAGS) -o $@ $(addprefix $(OBJ_DIR)/,$(OBJECTS))
+$(LOG4CXY): $(OBJECTS) Makefile
+	g++ $(LINK_FLAGS) -o $@ $(OBJECTS)
 
 VPATH = $(SRC_DIR)
-$(OBJ_DIR)/%.o: %.cpp Makefile $(OBJ_DIR)
+$(OBJ_DIR)/%.o: %.cpp Makefile
+	@test -d $(OBJ_DIR) || mkdir -v $(OBJ_DIR)
 	g++ $(CXX_FLAGS) $< -o $@
-
-$(OBJ_DIR):
-	mkdir -v $(OBJ_DIR)
 
 include $(wildcard $(OBJ_DIR)/*.d)
 include profile.inc.mk

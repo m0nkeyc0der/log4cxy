@@ -1,0 +1,37 @@
+20130407 22:14:37.380384:T1081367360:L3: LogPerfMonitor.runMonitorThread - thread 1081367360 started
+20130407 22:14:38.383332:T1081367360:L3: log writer performance 51242 messages/sec, 0 flush/sec
+20130407 22:14:39.383708:T1081367360:L3: log writer performance 45997 messages/sec, 0 flush/sec
+20130407 22:14:40.387465:T1081367360:L3: log writer performance 47258 messages/sec, 0 flush/sec
+20130407 22:14:41.387864:T1081367360:L3: log writer performance 44123 messages/sec, 0 flush/sec
+20130407 22:14:42.388396:T1081367360:L3: log writer performance 42323 messages/sec, 0 flush/sec
+20130407 22:14:43.389033:T1081367360:L3: log writer performance 49249 messages/sec, 0 flush/sec
+20130407 22:14:44.389401:T1081367360:L3: log writer performance 50129 messages/sec, 0 flush/sec
+20130407 22:14:45.389746:T1081367360:L3: log writer performance 47778 messages/sec, 0 flush/sec
+20130407 22:14:46.393037:T1081367360:L3: log writer performance 47816 messages/sec, 0 flush/sec
+20130407 22:14:47.426582:T1081367360:L3: log writer performance 45209 messages/sec, 0 flush/sec
+20130407 22:14:48.426948:T1081367360:L3: log writer performance 31769 messages/sec, 0 flush/sec
+20130407 22:14:49.427989:T1081367360:L3: log writer performance 50174 messages/sec, 0 flush/sec
+20130407 22:14:50.429065:T1081367360:L3: log writer performance 52486 messages/sec, 0 flush/sec
+20130407 22:14:51.429512:T1081367360:L3: log writer performance 51238 messages/sec, 0 flush/sec
+20130407 22:14:52.429911:T1081367360:L3: log writer performance 53989 messages/sec, 0 flush/sec
+20130407 22:14:53.430288:T1081367360:L3: log writer performance 40738 messages/sec, 0 flush/sec
+20130407 22:14:54.433458:T1081367360:L3: log writer performance 52195 messages/sec, 0 flush/sec
+20130407 22:14:55.433740:T1081367360:L3: log writer performance 42455 messages/sec, 0 flush/sec
+20130407 22:14:56.435068:T1081367360:L3: log writer performance 29001 messages/sec, 0 flush/sec
+20130407 22:14:57.436344:T1081367360:L3: log writer performance 53163 messages/sec, 0 flush/sec
+20130407 22:14:58.440945:T1081367360:L3: log writer performance 54450 messages/sec, 0 flush/sec
+20130407 22:14:59.441353:T1081367360:L3: log writer performance 50539 messages/sec, 0 flush/sec
+20130407 22:15:00.442575:T1081367360:L3: log writer performance 27103 messages/sec, 0 flush/sec
+20130407 22:15:01.443011:T1081367360:L3: log writer performance 24980 messages/sec, 0 flush/sec
+20130407 22:15:02.445437:T1081367360:L3: log writer performance 52718 messages/sec, 0 flush/sec
+20130407 22:15:03.446032:T1081367360:L3: log writer performance 52647 messages/sec, 0 flush/sec
+20130407 22:15:04.446427:T1081367360:L3: log writer performance 49500 messages/sec, 0 flush/sec
+20130407 22:15:05.449120:T1081367360:L3: log writer performance 46020 messages/sec, 0 flush/sec
+20130407 22:15:06.454216:T1081367360:L3: log writer performance 48484 messages/sec, 0 flush/sec
+20130407 22:15:07.494324:T1081367360:L3: log writer performance 49739 messages/sec, 0 flush/sec
+20130407 22:15:08.498997:T1081367360:L3: log writer performance 47889 messages/sec, 0 flush/sec
+20130407 22:15:09.499361:T1081367360:L3: log writer performance 44820 messages/sec, 0 flush/sec
+20130407 22:15:10.505818:T1081367360:L3: log writer performance 51258 messages/sec, 0 flush/sec
+20130407 22:15:11.506171:T1081367360:L3: log writer performance 47829 messages/sec, 3 flush/sec
+20130407 22:15:12.015740:T1077121472:L3: LogPerfMonitor.wrapUp...
+20130407 22:15:12.506947:T1081367360:L3: log writer performance 23729 messages/sec, 13 flush/sec

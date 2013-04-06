@@ -1,6 +1,7 @@
 #ifndef LOG_WRITER_H
 #define LOG_WRITER_H
 
+#include <functional>
 #include <memory>
 #include <string>
 
@@ -10,6 +11,8 @@ namespace log4cxy
 class LogWriter
 {
 public:
+  typedef std::function<bool (LogWriter*)> FindImplPred;
+
   //! @return false to indicate, that the object implements a stub
   virtual bool isValid() volatile = 0;
 
@@ -18,6 +21,12 @@ public:
 
   virtual void flush() = 0;
   virtual void flush() volatile = 0;
+
+  virtual std::shared_ptr<LogWriter> getImpl(FindImplPred p)
+  {
+    std::shared_ptr<LogWriter> null;
+    return null;
+  }
 
   virtual ~LogWriter() {}
 };
