@@ -24,7 +24,7 @@ void Logger::flush() throw()
   }
   catch (const std::exception& err)
   {
-    log(ERROR, "Logger flush error: %1%", err.what());
+    formatLog(ERROR, "Logger flush error: %1%", err.what());
   }
 
   if (_chainLogger)

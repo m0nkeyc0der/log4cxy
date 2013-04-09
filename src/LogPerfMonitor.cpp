@@ -33,14 +33,14 @@ void LogPerfMonitor::wrapUp() throw()
   }
   catch(const std::exception& err)
   {
-    _logTo.log(ERROR, "LogPerfMonitor.wrapUp - %1%", err.what());
+    _logTo.formatLog(ERROR, "LogPerfMonitor.wrapUp - %1%", err.what());
   }
 }
 
 void LogPerfMonitor::monitorThreadFunc(LogPerfMonitor* self)
 {
-  self->_logTo.log(ALERT, "LogPerfMonitor.runMonitorThread - thread %1% started",
-                          std::this_thread::get_id());
+  self->_logTo.formatLog(ALERT, "LogPerfMonitor.runMonitorThread - thread %1% started",
+                                std::this_thread::get_id());
 
   LogWriteEventCount stat(self->_initStat);
   StreamWriterThreadSafePtr writer;
@@ -55,9 +55,10 @@ void LogPerfMonitor::monitorThreadFunc(LogPerfMonitor* self)
 
     LogWriteEventCount statNew = writer->getEventCount();
 
-    self->_logTo.log(ALERT, "log writer performance %1% messages/sec, %2% flush/sec",
-                            (statNew.getNumWrites() - stat.getNumWrites()),
-                            (statNew.getNumFlush() - stat.getNumFlush()));
+    self->_logTo.formatLog(ALERT, "log writer performance %1% messages/sec, %2% flush/sec",
+                                  (statNew.getNumWrites() - stat.getNumWrites()),
+                                  (statNew.getNumFlush() - stat.getNumFlush()));
+    self->_logTo.flush();
     stat = statNew;
 
     // update to catch stop event

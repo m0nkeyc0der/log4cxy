@@ -35,7 +35,7 @@ public:
 
   // boost::format syntax
   template<typename... Args>
-  void log(int level, const char* format, const Args&... args) throw()
+  void formatLog(int level, const char* format, const Args&... args) throw()
   {
     bool isFatal = true;
     try
@@ -52,7 +52,7 @@ public:
       }
       else if(_chainLogger)
       {
-        _chainLogger->log(level, format, args...);
+        _chainLogger->formatLog(level, format, args...);
       }
     }
     catch(const std::exception& err)
