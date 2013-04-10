@@ -1,0 +1,55 @@
+20130410 23:27:16.615139:T1093675840:L3: runThreads worker tid=1093675840 started, number of active threads = 1
+20130410 23:27:16.619965:T1089477440:L3: LogPerfMonitor.runMonitorThread - thread 1089477440 started
+20130410 23:27:17.632409:T1089477440:L3: log writer performance 16085 messages/sec, 0 flush/sec
+20130410 23:27:18.625742:T1097878336:L3: runThreads worker tid=1097878336 started, number of active threads = 2
+20130410 23:27:18.640558:T1089477440:L3: log writer performance 15161 messages/sec, 1 flush/sec
+20130410 23:27:19.641104:T1089477440:L3: log writer performance 19321 messages/sec, 1 flush/sec
+20130410 23:27:20.647587:T1089477440:L3: log writer performance 20206 messages/sec, 1 flush/sec
+20130410 23:27:20.661228:T1102080832:L3: runThreads worker tid=1102080832 started, number of active threads = 3
+20130410 23:27:21.654673:T1089477440:L3: log writer performance 20528 messages/sec, 1 flush/sec
+20130410 23:27:22.658462:T1089477440:L3: log writer performance 23304 messages/sec, 1 flush/sec
+20130410 23:27:22.671652:T1106283328:L3: runThreads worker tid=1106283328 started, number of active threads = 4
+20130410 23:27:23.661981:T1089477440:L3: log writer performance 24482 messages/sec, 1 flush/sec
+20130410 23:27:24.687726:T1089477440:L3: log writer performance 23949 messages/sec, 1 flush/sec
+20130410 23:27:24.708764:T1110485824:L3: runThreads worker tid=1110485824 started, number of active threads = 5
+20130410 23:27:25.699955:T1089477440:L3: log writer performance 23519 messages/sec, 1 flush/sec
+20130410 23:27:26.735714:T1114688320:L3: runThreads worker tid=1114688320 started, number of active threads = 6
+20130410 23:27:26.827615:T1089477440:L3: log writer performance 26970 messages/sec, 1 flush/sec
+20130410 23:27:27.828834:T1089477440:L3: log writer performance 24780 messages/sec, 1 flush/sec
+20130410 23:27:28.737954:T1118890816:L3: runThreads worker tid=1118890816 started, number of active threads = 7
+20130410 23:27:28.830387:T1089477440:L3: log writer performance 25725 messages/sec, 1 flush/sec
+20130410 23:27:29.837049:T1089477440:L3: log writer performance 24867 messages/sec, 1 flush/sec
+20130410 23:27:30.855603:T1089477440:L3: log writer performance 27416 messages/sec, 1 flush/sec
+20130410 23:27:30.819227:T1123093312:L3: runThreads worker tid=1123093312 started, number of active threads = 8
+20130410 23:27:31.671874:T1093675840:L3: runThreads worker tid=1093675840 stopped, number of active threads = 7
+20130410 23:27:31.889842:T1089477440:L3: log writer performance 22529 messages/sec, 2 flush/sec
+20130410 23:27:32.822142:T1095777088:L3: runThreads worker tid=1095777088 started, number of active threads = 8
+20130410 23:27:32.892236:T1089477440:L3: log writer performance 23697 messages/sec, 1 flush/sec
+20130410 23:27:33.663206:T1097878336:L3: runThreads worker tid=1097878336 stopped, number of active threads = 7
+20130410 23:27:33.905310:T1089477440:L3: log writer performance 25158 messages/sec, 2 flush/sec
+20130410 23:27:34.841887:T1099979584:L3: runThreads worker tid=1099979584 started, number of active threads = 8
+20130410 23:27:34.925796:T1089477440:L3: log writer performance 25062 messages/sec, 1 flush/sec
+20130410 23:27:35.673627:T1102080832:L3: runThreads worker tid=1102080832 stopped, number of active threads = 7
+20130410 23:27:36.065782:T1089477440:L3: log writer performance 28418 messages/sec, 2 flush/sec
+20130410 23:27:37.077056:T1089477440:L3: log writer performance 23976 messages/sec, 1 flush/sec
+20130410 23:27:37.677208:T1106283328:L3: runThreads worker tid=1106283328 stopped, number of active threads = 6
+20130410 23:27:38.086140:T1089477440:L3: log writer performance 26677 messages/sec, 2 flush/sec
+20130410 23:27:39.101241:T1089477440:L3: log writer performance 21526 messages/sec, 1 flush/sec
+20130410 23:27:39.726980:T1110485824:L3: runThreads worker tid=1110485824 stopped, number of active threads = 5
+20130410 23:27:40.121012:T1089477440:L3: log writer performance 27058 messages/sec, 2 flush/sec
+20130410 23:27:41.121372:T1089477440:L3: log writer performance 23085 messages/sec, 1 flush/sec
+20130410 23:27:41.742546:T1114688320:L3: runThreads worker tid=1114688320 stopped, number of active threads = 4
+20130410 23:27:42.125124:T1089477440:L3: log writer performance 22185 messages/sec, 2 flush/sec
+20130410 23:27:43.130668:T1089477440:L3: log writer performance 21051 messages/sec, 1 flush/sec
+20130410 23:27:43.784036:T1118890816:L3: runThreads worker tid=1118890816 stopped, number of active threads = 3
+20130410 23:27:44.135889:T1089477440:L3: log writer performance 22616 messages/sec, 2 flush/sec
+20130410 23:27:45.137997:T1089477440:L3: log writer performance 20018 messages/sec, 1 flush/sec
+20130410 23:27:45.877981:T1123093312:L3: runThreads worker tid=1123093312 stopped, number of active threads = 2
+20130410 23:27:46.150466:T1089477440:L3: log writer performance 20471 messages/sec, 2 flush/sec
+20130410 23:27:47.152806:T1089477440:L3: log writer performance 19387 messages/sec, 1 flush/sec
+20130410 23:27:47.938266:T1095777088:L3: runThreads worker tid=1095777088 stopped, number of active threads = 1
+20130410 23:27:48.155879:T1089477440:L3: log writer performance 18637 messages/sec, 2 flush/sec
+20130410 23:27:49.156383:T1089477440:L3: log writer performance 16128 messages/sec, 1 flush/sec
+20130410 23:27:49.856326:T1099979584:L3: runThreads worker tid=1099979584 stopped, number of active threads = 0
+20130410 23:27:49.856602:T1077042304:L3: LogPerfMonitor.wrapUp...
+20130410 23:27:50.156873:T1089477440:L3: log writer performance 11295 messages/sec, 2 flush/sec

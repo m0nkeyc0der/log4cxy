@@ -10,6 +10,7 @@
 #include <sys/time.h>
 
 // project headers
+#include "AsyncLogWriter.h"
 #include "FileLogWriter.h"
 #include "SyncLogWriter.h"
 
@@ -34,17 +35,19 @@ void Logger::flush() throw()
 Logger Logger::create(const char* filename, LogLevel minLogLevel)
 {
   LogWriterPtr fileWriter(new FileLogWriter(filename));
-  LogWriterThreadSafePtr syncWriter(new SyncLogWriter(fileWriter));
+//  LogWriterThreadSafePtr syncWriter(new SyncLogWriter(fileWriter));
+  LogWriterThreadSafePtr asyncWriter(new AsyncLogWriter(fileWriter), AsyncLogWriter::deleter);
 
-  return Logger(minLogLevel, syncWriter);
+  return Logger(minLogLevel, asyncWriter);
 }
 
 Logger Logger::create(std::ostream& os, LogLevel minLogLevel)
 {
   LogWriterPtr streamWriter(new StreamWriter(os));
-  LogWriterThreadSafePtr syncWriter(new SyncLogWriter(streamWriter));
+//  LogWriterThreadSafePtr syncWriter(new SyncLogWriter(streamWriter));
+  LogWriterThreadSafePtr asyncWriter(new AsyncLogWriter(streamWriter), AsyncLogWriter::deleter);
 
-  return Logger(minLogLevel, syncWriter);
+  return Logger(minLogLevel, asyncWriter);
 }
 
 Logger& Logger::addChainLogger(Logger chainLogger)
