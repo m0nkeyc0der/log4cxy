@@ -9,6 +9,7 @@
 
 #include "Logger.h"
 #include "LogPerfMonitor.h"
+#include "ProgramOptions.h"
 #include "StreamWriter.h"
 
 namespace log4cxy
@@ -50,25 +51,27 @@ void writeToLog(Logger log, int numSeconds)
 
 void runThreads(Logger log,
                 Logger perfLog,
-                int numThreadsToCreate,
-                int ttlNumSeconds,
-                float spawnDelay,
+                const ProgramOptions& po,
+                int numThreadsToCreate = -1,
                 volatile std::atomic_int* sharedWorkingThreadsCount = 0)
 {
+  if (numThreadsToCreate < 0)
+    numThreadsToCreate = po.getNumThreads();
+
   volatile std::atomic_int swtcTheOnlyRootInstance (0);
   if (!sharedWorkingThreadsCount)
     sharedWorkingThreadsCount = &swtcTheOnlyRootInstance;
 
   // spawn the worker...
   std::thread worker(
-      [log, &perfLog, ttlNumSeconds, sharedWorkingThreadsCount]
+      [log, &perfLog, &po, sharedWorkingThreadsCount]
       {
         perfLog.formatLog(ALERT,
                           "runThreads worker tid=%1% started, number of active threads = %2%",
                           std::this_thread::get_id(),
                           ++*sharedWorkingThreadsCount);
 
-        writeToLog(log, ttlNumSeconds);
+        writeToLog(log, po.getThreadTimeLimit());
 
         perfLog.formatLog(ALERT,
                           "runThreads worker tid=%1% stopped, number of active threads = %2%",
@@ -81,13 +84,12 @@ void runThreads(Logger log,
   {
     if (--numThreadsToCreate > 0)
     {
-      std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(spawnDelay * 1000.)));
+      std::this_thread::sleep_for(std::chrono::seconds(po.getDelay()));
 
       runThreads(log,
                  perfLog,
+                 po,
                  numThreadsToCreate,
-                 ttlNumSeconds,
-                 spawnDelay,
                  sharedWorkingThreadsCount);
     }
   }
@@ -106,28 +108,18 @@ void runThreads(Logger log,
 
 int main(int argc, char* argv[])
 {
-  using std::atoi;
   using namespace log4cxy;
-
-  int num_threads;
-  if (argc < 2 || !(num_threads = atoi(argv[1])))
-    num_threads = 15; // = default
-
-  int ttl_num_seconds; // to each thread for
-  if (argc < 3 || !(ttl_num_seconds = atoi(argv[2])))
-    ttl_num_seconds = 10; // = default
-
-  float spawn_delay = 2.;
-  if (argc >= 4)
-    spawn_delay = atof(argv[3]);
-
-  const char* logfile = "trace.log";
-  if (argc >= 5)
-    logfile = argv[4];
 
   try
   {
-    Logger log = Logger::create(logfile, LogLevel::TRACE);
+    ProgramOptions po(argc, argv);
+    if (!po.isValid() || po.needHelp())
+    {
+      po.printHelp();
+      return 1;
+    }
+
+    Logger log = Logger::create(po.getTraceLogFile().c_str(), LogLevel::TRACE);
 
     // would like to have alert messages on stdout
     log.addChainLogger(Logger::create(std::cout, LogLevel::ALERT));
@@ -148,11 +140,11 @@ int main(int argc, char* argv[])
       log.formatLog(LogLevel::ALERT, "setting number of threads = %1%, "
                                      "number of seconds to run = %2%, "
                                      "each thread starts with %3% sec delay",
-                                     num_threads,
-                                     ttl_num_seconds,
-                                     spawn_delay);
+                                     po.getNumThreads(),
+                                     po.getThreadTimeLimit(),
+                                     po.getDelay());
 
-      runThreads(log, perfLog, num_threads, ttl_num_seconds, spawn_delay);
+      runThreads(log, perfLog, po);
     }
     catch(const std::exception& err)
     {

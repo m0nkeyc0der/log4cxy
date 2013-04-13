@@ -26,16 +26,18 @@ CXX_FLAGS      = -MMD -pthread -D_GLIBCXX_USE_NANOSLEEP -c -fmessage-length=0 -s
 	         $(DEBUG_FLAGS) \
 	         $(OPTIMIZE_FLAGS)
 
-LINK_FLAGS     = -pthread $(DEBUG_FLAGS)
+LINK_FLAGS     = -pthread -lboost_program_options $(DEBUG_FLAGS)
 # ===========================
 
 # ===========================
 # Run arguments
 # ===========================
-RUN_NUM_THREADS        = 15
+RUN_NUM_THREADS        = 24
 RUN_THREAD_TTL         = 10
-RUN_THREAD_START_DELAY = 2
-RUN_ARGS               = $(RUN_THREAD_TTL) $(RUN_NUM_THREADS) $(RUN_THREAD_START_DELAY)
+RUN_THREAD_START_DELAY = 1
+RUN_ARGS               = --num-threads $(RUN_NUM_THREADS) \
+                         --time $(RUN_THREAD_TTL) \
+                         --delay $(RUN_THREAD_START_DELAY)
 
 # ===========================
 # Make targets
@@ -51,7 +53,7 @@ run: $(LOG4CXY)
 	./$(LOG4CXY) $(RUN_ARGS)
 
 $(LOG4CXY): $(OBJECTS) Makefile
-	g++ $(LINK_FLAGS) -o $@ $(OBJECTS)
+	g++ $(OBJECTS) $(LINK_FLAGS) -o $@
 
 VPATH = $(SRC_DIR)
 $(OBJ_DIR)/%.o: %.cpp Makefile

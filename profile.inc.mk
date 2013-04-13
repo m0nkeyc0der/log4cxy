@@ -1,11 +1,10 @@
 # ===========================
 # Profiling
 # ===========================
-PROFILE_NUM_THREADS     = 16
-PROFILE_NUM_MESSAGES    = 100000
+PROFILE_NUM_THREADS     = $(RUN_NUM_THREADS)
 PROFILE_REPORT_DIR      = report
 PROFILE_FILENAME        = $(PROFILE_REPORT_DIR)/$(LOG4CXY).prof
-PROFILE_REPORT_FILENAME = $(PROFILE_REPORT_DIR)/perf_report_$(PROFILE_NUM_THREADS)x$(PROFILE_NUM_MESSAGES)
+PROFILE_REPORT_FILENAME = $(PROFILE_REPORT_DIR)/perf_report_$(PROFILE_NUM_THREADS)
 GOOGLE_PPROF            = /usr/bin/google-pprof
 # ===========================
 
